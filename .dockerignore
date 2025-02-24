@@ -1,0 +1,6 @@
+ Dockerfile*
+ makefile
+ Readme.md
+ .pytest*
+ .venv
+*.cfg

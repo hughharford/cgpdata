@@ -1,0 +1,10 @@
+title: "DataProcessor"
+description: "Role for data processing tasks across GCS, BigQuery, and Pub/Sub."
+stage: "Alpha"
+includedPermissions:
+- storage.objects.get
+- storage.objects.create
+- storage.buckets.get
+- bigquery.tables.getData
+- bigquery.jobs.create
+- pubsub.topics.publish
