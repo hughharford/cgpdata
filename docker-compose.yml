@@ -29,6 +29,9 @@ services:
             - ./dags:/app/airflow/dags
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
+            # hsth dbt in airflow 03-03-02
+            - ~/.gcp_keys:/app/airflow/.gcp_keys
+            - ./dbt_lewagon:/app/airflow/dbt_lewagon
 
     webserver:
         build: .
