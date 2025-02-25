@@ -31,7 +31,8 @@ services:
             - ./logs:/app/airflow/logs
             # hsth dbt in airflow 03-03-02
             - ~/.gcp_keys:/app/airflow/.gcp_keys
-            - ./dbt_lewagon:/app/airflow/dbt_lewagon
+            - ./dbt_cgpdata:/app/airflow/dbt_cgpdata
+                            
 
     webserver:
         build: .
