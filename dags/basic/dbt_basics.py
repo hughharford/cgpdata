@@ -17,7 +17,7 @@ DBT_DIR = os.getenv("DBT_DIR")
 with DAG(
     "dbt_basics",
     # $CODE_BEGIN
-    default_args={ "depends_on_past": True, },
+    default_args={ "depends_on_past": False, },
     start_date=pendulum.today("UTC").add(days=-1),
     schedule_interval="@daily",
     catchup=True,
@@ -33,6 +33,11 @@ with DAG(
         bash_command=f"dbt --version",
     )
 
+    dbt_dag_test_3 = BashOperator(
+        task_id="dbt_dag_test_3",
+        bash_command=f"pwd",
+    )
+
     # $CHA_BEGIN
     dbt_run = BashOperator(
         task_id="dbt_run",
@@ -44,5 +49,5 @@ with DAG(
         bash_command=f"dbt test --project-dir {DBT_DIR}",
     )
 
-    dbt_dag_test >> dbt_dag_test_2 >> dbt_run >> dbt_test
+    dbt_dag_test >> dbt_dag_test_2 >> dbt_dag_test_3 >> dbt_run >> dbt_test
     # $CHA_END
