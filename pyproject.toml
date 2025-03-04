@@ -19,8 +19,8 @@ apache-airflow-providers-google = "^14.0.0"
 # pendulum = "^3.0.0"
 # pyarrow = "19.0.1"
 # numpy = ">=1.26.4"
-dotenv = "^0.9.9"
 yfinance = "^0.2.54"
+dotenv = "^0.9.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
