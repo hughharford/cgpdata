@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: silver_model_one
+    description: "A silver model to see if dbt generates into manifest.json"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+

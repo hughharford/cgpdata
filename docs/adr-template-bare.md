@@ -1,9 +1,9 @@
 ---
 status:
-date: 
-decision-makers: 
-consulted: 
-informed: 
+date:
+decision-makers:
+consulted:
+informed:
 ---
 
 # <!-- short title, representative of solved problem and found solution -->
