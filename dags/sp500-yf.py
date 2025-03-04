@@ -1,59 +1,58 @@
-from airflow import DAG
-from airflow.providers.google.cloud.operators.gcs import GCSBucketCreateAclEntryOperator
-from google.cloud import storage
-import yfinance as yf
-import pandas as pd
-import io
-import os
-from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import yfinance as yf
+import io
+from airflow import DAG
+from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.operators.python import PythonOperator
+import os
 
-# Load environment variables
-load_dotenv()
+AIRFLOW_HOME = os.getenv("AIRFLOW_HOME")
 
-# Read GCP bucket name from .env
-GCP_BUCKET_NAME = os.getenv('GCP_BUCKET_NAME')
+def fetch_and_upload_sp500():
+    """Fetch S&P 500 data using yfinance and upload it to GCS"""
+    # GCS details
+    gcs_hook = GCSHook(gcp_conn_id='google_cloud_default')
+    bucket_name = "cgpdata"  # GCS landing bucket name
+    object_name = f"s&p500_data_{datetime.today().strftime('%Y%m%d')}.csv"  # File name based on date
 
-default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2025, 1, 1),
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
-}
+    # Fetch the S&P 500 data using yfinance
+    sp500_data = yf.download('^GSPC', period='1d', interval='1d')
 
-dag = DAG(
-    'upload_sp500_to_gcs',
-    default_args=default_args,
-    schedule_interval='@daily',
-    catchup=False
-)
-
-def fetch_and_upload_to_gcs():
-    sp500_data = yf.download('^GSPC', period='1d')
-
+    # Convert DataFrame to CSV in-memory
     csv_buffer = io.StringIO()
     sp500_data.to_csv(csv_buffer)
     csv_buffer.seek(0)
 
-    client = storage.Client()  # Make sure credentials are set properly
-    bucket = client.bucket(GCP_BUCKET_NAME)
-    blob = bucket.blob(f'sp500_data_{datetime.today().strftime("%Y%m%d")}.csv')
-    blob.upload_from_string(csv_buffer.getvalue(), content_type='text/csv')
+    # Upload the CSV data to Google Cloud Storage
+    gcs_hook.upload(
+        bucket_name=bucket_name,
+        object_name=object_name,
+        data=csv_buffer.getvalue(),
+        mime_type='text/csv'
+    )
+    print(f"Successfully uploaded {object_name} to GCS bucket {bucket_name}")
 
-upload_task = PythonOperator(
-    task_id='fetch_and_upload_sp500',
-    python_callable=fetch_and_upload_to_gcs,
-    dag=dag
-)
 
-set_acl_task = GCSBucketCreateAclEntryOperator(
-    task_id='set_acl',
-    bucket_name=GCP_BUCKET_NAME,
-    entity='allUsers',
-    role='READER',
-    dag=dag
-)
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2025, 3, 2),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
 
-upload_task >> set_acl_task
+with DAG(
+    'sp500_to_gcs',
+    default_args=default_args,
+    description='Fetch daily S&P 500 data and upload to GCS',
+    schedule_interval='@daily',
+    catchup=False,
+) as dag:
+
+
+    fetch_and_upload_task = PythonOperator(
+        task_id='fetch_and_upload_sp500',
+        python_callable=fetch_and_upload_sp500,
+    )
+
+fetch_and_upload_task
