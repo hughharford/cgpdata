@@ -28,26 +28,27 @@ with DAG(
         bash_command=f"echo {DBT_DIR}",
     )
 
-    dbt_dag_test_2 = BashOperator(
-        task_id="dbt_dag_test_2",
-        bash_command=f"dbt --version",
-    )
+    # dbt_dag_test_2 = BashOperator(
+    #     task_id="dbt_dag_test_2",
+    #     bash_command=f"dbt --version",
+    # )
 
-    dbt_dag_test_3 = BashOperator(
-        task_id="dbt_dag_test_3",
-        bash_command=f"pwd",
-    )
+    # dbt_dag_test_3 = BashOperator(
+    #     task_id="dbt_dag_test_3",
+    #     bash_command=f"pwd",
+    # )
 
     # $CHA_BEGIN
     dbt_run = BashOperator(
         task_id="dbt_run",
-        bash_command=f"dbt run --project-dir {DBT_DIR}",
+        bash_command=f"dbt run -s my_first_dbt_model --project-dir {DBT_DIR}",
     )
 
-    dbt_test = BashOperator(
-        task_id="dbt_test",
-        bash_command=f"dbt test --project-dir {DBT_DIR}",
-    )
+    # dbt_test = BashOperator(
+    #     task_id="dbt_test",
+    #     bash_command=f"dbt test --project-dir {DBT_DIR}",
+    # )
 
-    dbt_dag_test >> dbt_dag_test_2 >> dbt_dag_test_3 >> dbt_run >> dbt_test
+    dbt_dag_test >> dbt_run
+    # dbt_dag_test >> dbt_dag_test_2 >> dbt_dag_test_3 >> dbt_run >> dbt_test
     # $CHA_END
