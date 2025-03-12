@@ -9,11 +9,12 @@ import sys
 # Add parent dir to PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from src.extract.fetch_data import fetch_alphavan_data
+from src.extract.fetch_data import fetch_alphavantage_data
 from src.extract.upload_gcs import upload_to_gcs, is_last_trading_day
 
 # Constants
 SYMBOL = "SPY"
+source = "alphavantage"
 
 # ---------------- FUNCTION TO RUN TASKS ----------------
 def fetch_and_upload_data(data_type, function, execution_date, **kwargs):
@@ -34,16 +35,16 @@ def fetch_and_upload_data(data_type, function, execution_date, **kwargs):
         return
 
     # Fetch and Upload
-    data = fetch_alphavan_data(SYMBOL, function)
+    data = fetch_alphavantage_data(SYMBOL, function)
     if data:
-        object_name = f"raw/alpha_vantage/{SYMBOL}/{data_type}/{SYMBOL}_{data_type}_{execution_date.strftime('%Y%m%d')}.json"
+        object_name = f"raw/alpha_vantage/{SYMBOL}/{data_type}/{SYMBOL}_{data_type}_{execution_date.strftime('%Y%m%d')}.csv"
         upload_to_gcs(data, object_name)
 
 # ---------------- AIRFLOW DAG ----------------
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 1, tzinfo=pytz.utc),
+    "start_date": datetime(2025, 3, 10, tzinfo=pytz.utc),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
@@ -53,10 +54,11 @@ with DAG(
     default_args=default_args,
     description="Fetch daily, weekly, and monthly SPY data from Alpha Vantage and upload to GCS",
     schedule_interval="@daily",
-    catchup=False,
+    catchup=True,
 ) as dag:
 
-    fetch_daily = PythonOperator(
+
+    '''fetch_daily = PythonOperator(
         task_id="fetch_daily",
         python_callable=fetch_and_upload_data,
         op_kwargs={"data_type": "daily", "function": "TIME_SERIES_DAILY"},
@@ -77,4 +79,4 @@ with DAG(
         provide_context=True
     )
 
-    fetch_daily >> fetch_weekly >> fetch_monthly
+    fetch_daily >> fetch_weekly >> fetch_monthly'''

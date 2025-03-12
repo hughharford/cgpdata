@@ -14,8 +14,8 @@ def upload_to_gcs(data, object_name):
     gcs_hook.upload(
         bucket_name=BUCKET_NAME,
         object_name=object_name,
-        data=json.dumps(data),
-        mime_type="application/json"
+        data=data,  # CSV data as a string
+        mime_type="text/csv"  # Correct MIME type for CSV
     )
 
 def is_last_trading_day(execution_date):

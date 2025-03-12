@@ -1,33 +1,41 @@
 import requests
-import os
 import yfinance as yf
-import json
+import os, io
 
 # ---------------- Alpha Vantage API ----------------
 
 API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 
-def fetch_alphavan_data(symbol, function):
+def fetch_alphavantage_data(symbol, function):
     """
-    Fetches data from Alpha Vantage API for a given function.
+    :param symbol: Stock ticker (e.g., SPY)
+    :param function: API function ('TIME_SERIES_DAILY', 'TIME_SERIES_WEEKLY', 'TIME_SERIES_MONTHLY')
+    :return: CSV data as string
     """
-    url = f"https://www.alphavantage.co/query?function={function}&symbol={symbol}&apikey={API_KEY}"
-    response = requests.get(url)
+    url = f"https://www.alphavantage.co/query"
 
-    if response.status_code != 200:
-        print(f"Error fetching {function} data: {response.status_code}")
+    params = {
+        "function": function,
+        "symbol": symbol,
+        "apikey": API_KEY,
+        "datatype": "csv"  # Request CSV format
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        return response.text  # CSV data as string
+    else:
+        print(f"Error fetching {symbol} ({function}): {response.status_code}, {response.text}")
         return None
 
-    return response.json()
 
 # ---------------- yfinance API ----------------
 def fetch_yfinance_data(symbol, period):
     """
-    Fetches stock data from Yahoo Finance.
-
-    :param symbol: Stock ticker (e.g., SPY)
+    :param symbol: Stock ticker
     :param period: Data period ('1d' for daily, '1wk' for weekly, '1mo' for monthly)
-    :return: JSON data
+    :return: CSV data as string
     """
     try:
         stock = yf.Ticker(symbol)
@@ -37,7 +45,10 @@ def fetch_yfinance_data(symbol, period):
             print(f"No data found for {symbol} ({period})")
             return None
 
-        return data.to_json()  # Convert DataFrame to JSON
+        # Convert DataFrame to CSV string
+        csv_buffer = io.StringIO()
+        data.to_csv(csv_buffer)
+        return csv_buffer.getvalue()
 
     except Exception as e:
         print(f"Error fetching {symbol} ({period}): {str(e)}")

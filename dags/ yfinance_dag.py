@@ -13,7 +13,9 @@ from src.extract.fetch_data import fetch_yfinance_data
 from src.extract.upload_gcs import upload_to_gcs, is_last_trading_day
 
 # List of stocks to fetch (S&P 500 ETF + others)
-SYMBOLS = ["^GSPC", "AAPL", "TSLA"]
+#SYMBOLS = ["^GSPC", "AAPL", "TSLA"]
+SYMBOLS = ["^GSPC"]
+source = 'yfinance'
 
 # ---------------- FUNCTION TO RUN TASKS ----------------
 def fetch_and_upload_data(data_type, period, execution_date, **kwargs):
@@ -37,7 +39,7 @@ def fetch_and_upload_data(data_type, period, execution_date, **kwargs):
     for symbol in SYMBOLS:
         data = fetch_yfinance_data(symbol, period)
         if data:
-            object_name = f"raw/yfinance/{symbol}/{data_type}/{symbol}_{data_type}_{execution_date.strftime('%Y%m%d')}.json"
+            object_name = f"raw/yfinance/{symbol}/{data_type}/{symbol}_{data_type}_{execution_date.strftime('%Y%m%d')}.csv"
             upload_to_gcs(data, object_name)
 
 # ---------------- AIRFLOW DAG ----------------
@@ -54,10 +56,10 @@ with DAG(
     default_args=default_args,
     description="Fetch daily, weekly, and monthly SP500 data from Yahoo Finance and upload to GCS",
     schedule_interval="@daily",
-    catchup=False,
+    catchup=True,
 ) as dag:
 
-    fetch_daily = PythonOperator(
+    '''fetch_daily = PythonOperator(
         task_id="fetch_daily",
         python_callable=fetch_and_upload_data,
         op_kwargs={"data_type": "daily", "period": "1d"},
@@ -78,4 +80,4 @@ with DAG(
         provide_context=True
     )
 
-    fetch_daily >> fetch_weekly >> fetch_monthly
+    fetch_daily >> fetch_weekly >> fetch_monthly'''
