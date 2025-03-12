@@ -68,13 +68,20 @@ def source_backward_months_data():
         mm=mm-1
         print(f'yyyy={str(yyyy)} and mm={str(mm)}')
         data = get_historicals_from_alphavantage(yyyy=yyyy, mm=mm)
+        if 'Information' in data.keys():
+            print(f"{data['Information']}")
+            raise IndexError('ERROR: stopping data retrieval and upload now')
         df = pd.DataFrame.from_dict(data["Time Series (5min)"], orient="index")
         csv_name = f"{yyyy}-{mm}-{TICKER}_{INTERVAL}_{SOURCE}.csv"
         df.to_csv(f"{LOCAL_PATH}/{csv_name}")
-        if df["Time Series (5min)"][0][:10] != YESTERDAY:
+        if df["Unnamed: 0"][0][:10] != YESTERDAY:
             source_file_name = f"{LOCAL_PATH}/{csv_name}"
             destination_blob_name = f"{gcpbucket_folder_string}/{csv_name}"
             upload_blob(bucket_name, source_file_name, destination_blob_name)
+        else:
+            print(f'date time from retrieved data is yesteday: {df["Unnamed: 0"][0][:10]}')
+            print('stopping data retrieval and upload now')
+            break
 
 if __name__ == "__main__":
     source_backward_months_data()
