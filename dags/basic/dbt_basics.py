@@ -25,7 +25,7 @@ with DAG(
 ) as dag:
     dbt_dag_test = BashOperator(
         task_id="dbt_dag_test",
-        bash_command=f"echo {DBT_DIR}",
+        bash_command=f"dbt source freshness --project-dir {DBT_DIR}",
     )
 
     dbt_dag_test_2 = BashOperator(

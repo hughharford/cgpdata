@@ -9,7 +9,7 @@ WITH source_data AS (
         CAST(_4__close AS FLOAT64) AS close,
         CAST(_5__volume AS INT64) AS volume,
         'SPY' AS ticker
-    FROM {{ source('raw_data', 'external_table_test') }}
+    FROM {{ source('raw_data', 'external_table') }}
 )
 
 SELECT * FROM source_data
