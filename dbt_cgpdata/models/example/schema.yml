@@ -1,20 +1,55 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: external_table_trans
+    description: "Transforms raw financial data from the external table"
     columns:
-      - name: id
-        description: "The primary key for this table"
-        tests:
-          - unique
-          - not_null
+      - name: timestamp
+        description: "Timestamp of price data"
+      - name: open
+        description: "Opening price"
+      - name: high
+        description: "Highest price"
+      - name: low
+        description: "Lowest price"
+      - name: close
+        description: "Closing price"
+      - name: volume
+        description: "Trading volume"
 
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
+  - name: decimal_trans
+    description: "Further transformation or aggregation of financial data"
     columns:
-      - name: id
-        description: "The primary key for this table"
-        tests:
-          - unique
-          - not_null
+      - name: timestamp
+        description: "Timestamp of price data"
+      - name: open
+        description: "Opening price"
+      - name: high
+        description: "Highest price"
+      - name: low
+        description: "Lowest price"
+      - name: close
+        description: "Closing price"
+      - name: volume
+        description: "Trading volume"
+
+sources:
+  - name: raw_data
+    database: condorgp-451516
+    schema: cgpdata_lwb
+    tables:
+      - name: external_table
+        description: "External table containing Yahoo Finance data from GCS"
+        columns:
+          - name: timestamp_field_0
+            description: "Timestamp of price data"
+          - name: _1_open
+            description: "Open price"
+          - name: _2_high
+            description: "High price"
+          - name: _3_low
+            description: "Low price"
+          - name: _4_close
+            description: "Close price"
+          - name: _5_volume
+            description: "Trading volume"

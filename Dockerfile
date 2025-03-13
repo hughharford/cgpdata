@@ -35,7 +35,6 @@ ENV VIRTUAL_ENV=$AIRFLOW_HOME/.venv \
 
 COPY scripts scripts
 RUN chmod +x scripts/entrypoint.sh
-RUN chmod +x scripts/init_connections.sh
 
 
 CMD ["/bin/bash"]

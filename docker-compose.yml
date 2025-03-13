@@ -29,7 +29,7 @@ services:
             - ./dags:/app/airflow/dags
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
-            - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
+            - /home/peripriego/.gcp_keys:/app/airflow/.gcp_keys
             - ./dbt_cgpdata:/app/airflow/dbt_cgpdata
 
 
@@ -50,7 +50,7 @@ services:
             - ./dags:/app/airflow/dags
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
-            - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
+            - /home/peripriego/.gcp_keys:/app/airflow/.gcp_keys
             - ./dbt_cgpdata:/app/airflow/dbt_cgpdata
         ports:
             - "8080:8080"
