@@ -5,6 +5,7 @@ webserver_config.py
 tests/temp/
 logs/**
 database/
+database_cgp/
 *.json
 !**/.gitkeep
 .user.yml

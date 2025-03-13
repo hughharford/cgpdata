@@ -2,8 +2,8 @@ services:
     postgres:
         image: postgres:14
         environment:
-            - POSTGRES_DB=db
-            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            - POSTGRES_DB=${POSTGRES_DB_AF}
+            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
             - POSTGRES_USER=airflow
         volumes:
             - ./database/:/var/lib/postgresql/data
@@ -23,7 +23,7 @@ services:
             - postgres
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD@postgres:5432/db
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres:5432/db
             - AIRFLOW__CORE__LOAD_EXAMPLES=false
         volumes:
             - ./dags:/app/airflow/dags
@@ -42,9 +42,9 @@ services:
             - scheduler
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD@postgres:5432/db
-            - POSTGRES_DB=db
-            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres:5432/db
+            - POSTGRES_DB=${POSTGRES_DB_AF}
+            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
             - POSTGRES_USER=airflow
         volumes:
             - ./dags:/app/airflow/dags
@@ -59,3 +59,43 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+
+    cgp-grafana:
+      image: grafana/grafana
+      container_name: cgp-grafana
+      restart: unless-stopped
+      ports:
+      - 3000:3000
+      environment:
+        POSTGRES_DATABASE_URL: postgresql+psycopg2://${APP_DB_USER}:${APP_DB_PASS}@cgp-database:5442/${APP_DB_NAME}
+        GF_SECURITY_ADMIN_USER: "admin"
+      env_file:
+      - ./.env
+      user: '0'
+      volumes:
+        - ./grafana_data:/var/lib/grafana
+      depends_on:
+        - cgp-database
+
+
+    cgp-database:
+      image: postgres:14.2
+      container_name: cgp-database
+      restart: on-failure
+      healthcheck:
+        test: ["CMD", "pg_isready", "-U", "postgres"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      volumes:
+        - ./scripts/db_init/:/docker-entrypoint-initdb.d/
+        - ./database_cgp/:/var/lib/postgresql/data
+      ports:
+        - 5442:5432
+      environment:
+        - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_CGP
+        - POSTGRES_USER=$POSTGRES_USER_CGP
+        - POSTGRES_DB=$POSTGRES_DB_CGP
+        - APP_DB_USER=$APP_DB_USER
+        - APP_DB_PASS=$APP_DB_PASS
+        - APP_DB_NAME=$APP_DB_NAME
