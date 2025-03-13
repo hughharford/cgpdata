@@ -13,7 +13,12 @@ Suggest we run the following system for raw data classification:
 ## YYYY_MM_to_YYYY_MM_tickername_interval_source.csv
 
 e.g. for 20 years of yfinance SPY:
-               1990_01_to_2020_12_SPY_5M_yfinance.csv
+               1990-01-to-2020-12-SPY-5M-yfinance.csv
+
+NOTE:
+for single day data, which we are mostly going to get, use the following:
+               2020-12-SPY-5M-alphavantage.csv
+
 
 
 # API use versus data requirement

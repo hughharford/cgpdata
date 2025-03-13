@@ -38,16 +38,11 @@ with DAG(
         bash_command=f"dbt run -s decimal_trans --project-dir {DBT_DIR}",
     )
 
-    # $CHA_BEGIN
     dbt_run = BashOperator(
         task_id="dbt_run",
         bash_command=f"dbt run -s silver_trans --project-dir {DBT_DIR}",
     )
 
-    # dbt_test = BashOperator(
-    #     task_id="dbt_test",
-    #     bash_command=f"dbt test --project-dir {DBT_DIR}",
-    # )
 
     dbt_dag_test >> dbt_dag_test_2 >> dbt_dag_test_3 >> dbt_run
-    # $CHA_END
+

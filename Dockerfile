@@ -33,8 +33,8 @@ RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 ENV VIRTUAL_ENV=$AIRFLOW_HOME/.venv \
     PATH=$AIRFLOW_HOME"/.venv/bin:$PATH"
 
+COPY src src
 COPY scripts scripts
 RUN chmod +x scripts/entrypoint.sh
-
 
 CMD ["/bin/bash"]
