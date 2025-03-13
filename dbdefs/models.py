@@ -15,7 +15,7 @@ class DataFiles(Base):
     __tablename__ = os.environ.get("DATA_FILES_TABLE", "datafiles")
 
     # Columns
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     time_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     data_file_name = Column(String, nullable=False)
     upload_time_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

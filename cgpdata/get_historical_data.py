@@ -9,6 +9,7 @@ from google.cloud import storage
 
 AIRFLOW_HOME = os.getenv("AIRFLOW_HOME")
 KEY2 = os.getenv("HSTH_AV_KEY")
+GCP_KEY_FILE = os.getenv("GCP_KEY_FILE")
 
 SOURCE="alphavantage"
 API_KEY = KEY2
@@ -29,7 +30,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     # The path to your file to upload:  source_file_name = "local/path/to/file"
     # The ID of your GCS object:        destination_blob_name = "storage-object-name"
 
-    storage_client = storage.Client()
+    storage_client = storage.Client.from_service_account_json(GCP_KEY_FILE)
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
@@ -74,14 +75,14 @@ def source_backward_months_data():
         df = pd.DataFrame.from_dict(data["Time Series (5min)"], orient="index")
         csv_name = f"{yyyy}-{mm}-{TICKER}_{INTERVAL}_{SOURCE}.csv"
         df.to_csv(f"{LOCAL_PATH}/{csv_name}")
-        if df["Unnamed: 0"][0][:10] != YESTERDAY:
-            source_file_name = f"{LOCAL_PATH}/{csv_name}"
-            destination_blob_name = f"{gcpbucket_folder_string}/{csv_name}"
-            upload_blob(bucket_name, source_file_name, destination_blob_name)
-        else:
-            print(f'date time from retrieved data is yesteday: {df["Unnamed: 0"][0][:10]}')
-            print('stopping data retrieval and upload now')
-            break
+        # if df["Time Series (5min)"][0][:10] != YESTERDAY:
+        source_file_name = f"{LOCAL_PATH}/{csv_name}"
+        destination_blob_name = f"{gcpbucket_folder_string}/{csv_name}"
+        upload_blob(bucket_name, source_file_name, destination_blob_name)
+        # else:
+        #     print(f'date time from retrieved data is yesteday: {df["Time Series (5min)"][0][:10]}')
+        #     print('stopping data retrieval and upload now')
+        #     break
 
 if __name__ == "__main__":
     source_backward_months_data()
