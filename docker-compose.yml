@@ -25,8 +25,10 @@ services:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
             - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres:5432/db
             - AIRFLOW__CORE__LOAD_EXAMPLES=false
+            - PYTHONPATH=/app/airflow/src
         volumes:
             - ./dags:/app/airflow/dags
+            - ./src:/app/airflow/src
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
             - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
@@ -46,8 +48,10 @@ services:
             - POSTGRES_DB=${POSTGRES_DB_AF}
             - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
             - POSTGRES_USER=airflow
+            - PYTHONPATH=/app/airflow/src
         volumes:
             - ./dags:/app/airflow/dags
+            - ./src:/app/airflow/src
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
             - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
