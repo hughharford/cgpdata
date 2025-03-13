@@ -18,5 +18,6 @@ class DataFiles(Base):
     id = Column(Integer, primary_key=True)
     time_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     data_file_name = Column(String, nullable=False)
+    upload_time_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     year = Column(Integer, nullable=False)
     month = Column(Integer, nullable=False)

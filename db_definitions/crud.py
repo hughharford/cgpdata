@@ -13,7 +13,7 @@ def read_data_files(db: Session, skip: int = 0, limit: int = 100):
     """Function should return all data files listed with a skip and limit param"""
     return db.query(models.DataFiles).offset(skip).limit(limit).all()
 
-def create_comms(db: Session, comms: schemas.CommsCreate):
+def create_data_file_record(db: Session, comms: schemas.CommsCreate):
     """Function should create a new communication in the database"""
     db_comms = models.Comms(**comms.model_dump())
     db.add(db_comms)
