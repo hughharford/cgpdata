@@ -21,8 +21,8 @@ Run the following command in your terminal to add the **google_cloud_default** c
 ```sh
 docker exec -it cgpdata-scheduler airflow connections add google_cloud_default \
 --conn-type google_cloud_platform \
---conn-extra '{"extra__google_cloud_platform__keyfile": "$GCP_KEY_FILE",
-"extra__google_cloud_platform__project": "$GCP_PROJECT_ID"}'
+--conn-extra '{"extra__google_cloud_platform__keyfile": "${GCP_KEY_FILE}",
+"extra__google_cloud_platform__project": "${GCP_PROJECT_ID}"}'
 ```
 
 

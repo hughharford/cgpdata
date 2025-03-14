@@ -21,3 +21,5 @@ class DataFiles(Base):
     upload_time_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     year = Column(Integer, nullable=False)
     month = Column(Integer, nullable=False)
+    blob_size = Column(Integer, nullable=False)
+    layer_name = Column(String, nullable=False)

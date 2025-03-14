@@ -27,24 +27,30 @@ def read_data_files(db: Session, skip: int = 0, limit: int = 100):
     """Function should return all data files listed with a skip and limit param"""
     return db.query(models.DataFiles).offset(skip).limit(limit).all()
 
-def create_data_file_record(db: Session, datafile_about: dict):
+def create_data_file_record(db: Session, datafile_about: dict, layer: str=None):
     '''
     Records datafile record in cgpbackbone db
-    In table "datafiles"
+    In table "datafiles".
     '''
 
-    db_datafile_record = schemas.DataFilesCreate()
+    if not layer:
+        raise ValueError("must pass layer into read_data_files")
+    else:
+        db_datafile_record = schemas.DataFilesCreate()
 
-    db_datafile_record.data_file_name = datafile_about["datafilename"]
-    db_datafile_record.upload_time_date = datafile_about["uploadtime"]
-    db_datafile_record.year = int(datafile_about['year'])
-    db_datafile_record.month = int(datafile_about['month'])
+        db_datafile_record.data_file_name = datafile_about["datafilename"]
+        db_datafile_record.upload_time_date = datafile_about["uploadtime"]
+        db_datafile_record.year = int(datafile_about["year"])
+        db_datafile_record.month = int(datafile_about["month"])
+        db_datafile_record.blob_size = int(datafile_about["blob_size"])
 
-    db_ingoing = models.DataFiles(**db_datafile_record.model_dump())
-    db_ingoing.id = uuid.uuid4()
-    db.add(db_ingoing)
-    db.commit()
-    db.refresh(db_ingoing)
+        db_datafile_record.layer_name = layer
+
+        db_ingoing = models.DataFiles(**db_datafile_record.model_dump())
+        db_ingoing.id = uuid.uuid4()
+        db.add(db_ingoing)
+        db.commit()
+        db.refresh(db_ingoing)
 
     return db_ingoing.id
 

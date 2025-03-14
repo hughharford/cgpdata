@@ -28,6 +28,10 @@ services:
             - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres-airflow:5432/db
             - AIRFLOW__CORE__LOAD_EXAMPLES=false
             - PYTHONPATH=/app/airflow/src
+            - GCP_BQ_DATASET_NAME=$GCP_BQ_DATASET_NAME
+            - GCP_BQ_BRONZE_STAGING_TABLE=$GCP_BQ_BRONZE_STAGING_TABLE
+            - GCP_GCS_BUCKET_NAME=$GCP_GCS_BUCKET_NAME
+            - GCP_PROJECT_ID=$GCP_PROJECT_ID
         volumes:
             - ./dags:/app/airflow/dags
             - ./src:/app/airflow/src
@@ -52,6 +56,10 @@ services:
             - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
             - POSTGRES_USER=airflow
             - PYTHONPATH=/app/airflow/src
+            - GCP_PROJECT_ID=$GCP_PROJECT_ID
+            - GCP_BQ_DATASET_NAME=$GCP_BQ_DATASET_NAME
+            - GCP_BQ_BRONZE_STAGING_TABLE=$GCP_BQ_BRONZE_STAGING_TABLE
+            - GCP_GCS_BUCKET_NAME=$GCP_GCS_BUCKET_NAME
         volumes:
             - ./dags:/app/airflow/dags
             - ./src:/app/airflow/src
