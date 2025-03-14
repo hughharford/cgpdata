@@ -97,6 +97,9 @@ def get_blob_metadata(bucket_name, blob_name, storage_client=STORAGE_CLIENT):
     abt_datafile['datafilename'] = blob_name
     abt_datafile["uploadtime"] = blob.updated
     actualname = blob_name.split("/")[-1]
+    # print(len(actualname.split("-")))
+    # print(actualname)
+
     if len(actualname.split("-")) == 1:
         month = 99
         year = 99

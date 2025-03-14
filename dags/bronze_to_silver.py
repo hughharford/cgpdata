@@ -19,8 +19,8 @@ GCP_BQ_BRONZE_STAGING_TABLE = os.getenv("GCP_BQ_BRONZE_STAGING_TABLE")
 GCP_GCS_BUCKET_NAME = os.getenv("GCP_GCS_BUCKET_NAME")
 SILVER_PREFIX = "silver"
 
-dt = pendulum.from_format(pendulum.now(), 'YYYY-MM-DD')
-SILVER_BUCKET_FILE = f"e_silver_total_output_{dt}"
+dt = pendulum.now().to_date_string()
+SILVER_BUCKET_FILE = f"{dt}_e_silver_total_output"
 
 with DAG(
     "bronze_to_silver_dbt",
@@ -36,15 +36,10 @@ with DAG(
     #     bash_command=f"dbt source freshness --project-dir {DBT_DIR}",
     # )
 
-    # dag_print_user_info = BashOperator(
-    #     task_id="dag_print_user_info",
-    #     bash_command=f"gcloud auth list",
-    # )
-
-    # d_bronze_staging_table = BashOperator(
-    #     task_id="d_bronze_staging_table",
-    #     bash_command=f"dbt run -s d_bronze_staging_table --project-dir {DBT_DIR}",
-    # )
+    d_bronze_staging_table = BashOperator(
+        task_id="d_bronze_staging_table",
+        bash_command=f"dbt run -s d_bronze_staging_table --project-dir {DBT_DIR}",
+    )
 
     e_bronze_bigquery_to_silver_gcs = BigQueryToGCSOperator(
         task_id="e_bronze_bigquery_to_silver_gcs",
@@ -53,8 +48,4 @@ with DAG(
         destination_cloud_storage_uris=[f"gs://{GCP_GCS_BUCKET_NAME}/{SILVER_PREFIX}/{SILVER_BUCKET_FILE}.csv"],
     )
 
-
-    # dag_print_user_info
-    # >>
-    e_bronze_bigquery_to_silver_gcs
-    # >> d_bronze_staging_table
+    d_bronze_staging_table >> e_bronze_bigquery_to_silver_gcs
