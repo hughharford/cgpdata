@@ -13,13 +13,13 @@ GCP_KEY_FILE = os.getenv("GCP_KEY_FILE")
 
 SOURCE="alphavantage"
 API_KEY = KEY2
-YYYY="2020"
-MM="6" # start from 13 to get the full year
+YYYY="2019"
+MM="13" # start from 13 to get the full year
 INTERVAL="5min"
 TICKER="SPY"
 
 BUCKET_NAME = "cgpdata"
-GCPBUCKET_FOLDER_STRING = "hist"
+GCPBUCKET_FOLDER_STRING = "bronze"
 LOCAL_PATH="/home/hugh.harford/code/hughharford/cgpdata/data"
 YESTERDAY=(datetime.today()- timedelta(1)).strftime('%Y-%m-%d')
 

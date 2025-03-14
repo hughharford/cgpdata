@@ -140,7 +140,7 @@ def get_listed_blobs_in_cgpbackbone(layer: str="-"):
     return checker
 
 if __name__ == "__main__":
-    layers = ["raw", "hist", "silver", "gold"]
+    layers = ["raw", "hist", "bronze" "silver", "gold"]
     # blob_list = list_blobs_on_gcs(bucket_name=BUCKET_NAME
     #                               , storage_client=STORAGE_CLIENT
     #                               , layer="silver")
