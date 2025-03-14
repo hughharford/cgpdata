@@ -1,6 +1,7 @@
 services:
-    postgres:
+    postgres-airflow:
         image: postgres:14
+        container_name: postgres-airflow
         environment:
             - POSTGRES_DB=${POSTGRES_DB_AF}
             - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
@@ -15,15 +16,16 @@ services:
           - "5433:5432"
         restart: always
 
-    scheduler:
+    cgpdata-scheduler:
         build: .
         command: poetry run airflow scheduler
         restart: on-failure
+        container_name: cgpdata-scheduler
         depends_on:
-            - postgres
+            - postgres-airflow
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres:5432/db
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres-airflow:5432/db
             - AIRFLOW__CORE__LOAD_EXAMPLES=false
             - PYTHONPATH=/app/airflow/src
         volumes:
@@ -31,20 +33,21 @@ services:
             - ./src:/app/airflow/src
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
-            - /home/peripriego/.gcp_keys:/app/airflow/.gcp_keys
+            - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
             - ./dbt_cgpdata:/app/airflow/dbt_cgpdata
 
 
-    webserver:
+    cgpdata-webserver:
         build: .
         command: poetry run scripts/entrypoint.sh
         restart: on-failure
+        container_name: cgpdata-webserver
         depends_on:
-            - postgres
-            - scheduler
+            - postgres-airflow
+            - cgpdata-scheduler
         environment:
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres:5432/db
+            - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:$POSTGRES_PASSWORD_AF@postgres-airflow:5432/db
             - POSTGRES_DB=${POSTGRES_DB_AF}
             - POSTGRES_PASSWORD=$POSTGRES_PASSWORD_AF
             - POSTGRES_USER=airflow
@@ -54,7 +57,7 @@ services:
             - ./src:/app/airflow/src
             - ./data:/app/airflow/data
             - ./logs:/app/airflow/logs
-            - /home/peripriego/.gcp_keys:/app/airflow/.gcp_keys
+            - /home/hugh.harford/.gcp_keys:/app/airflow/.gcp_keys
             - ./dbt_cgpdata:/app/airflow/dbt_cgpdata
         ports:
             - "8080:8080"

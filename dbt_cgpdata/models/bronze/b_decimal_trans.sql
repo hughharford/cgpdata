@@ -12,7 +12,7 @@ WITH formatted_data AS (
         ROUND(close, 6) AS close,
         volume,
         ticker
-    FROM {{ ref('external_table_trans') }}
+    FROM {{ ref('a_external_table_trans') }}
 )
 
 SELECT * FROM formatted_data

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: external_table_trans
+  - name: a_external_table_trans
     description: "Transforms raw financial data from the external table"
     columns:
       - name: timestamp
@@ -17,7 +17,7 @@ models:
       - name: volume
         description: "Trading volume"
 
-  - name: decimal_trans
+  - name: b_decimal_trans
     description: "Further transformation or aggregation of financial data"
     columns:
       - name: timestamp
@@ -39,7 +39,7 @@ sources:
     schema: cgpdata_lwb
     tables:
       - name: external_table
-        description: "External table containing Yahoo Finance data from GCS"
+        description: "External table containing data from /hist"
         columns:
           - name: timestamp_field_0
             description: "Timestamp of price data"

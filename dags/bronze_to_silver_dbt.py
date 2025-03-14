@@ -15,7 +15,7 @@ DBT_DIR = os.getenv("DBT_DIR")
 
 
 with DAG(
-    "dbt_basics",
+    "bronze_to_silver_dbt",
     # $CODE_BEGIN
     default_args={ "depends_on_past": False, },
     start_date=pendulum.today("UTC").add(days=-1),
@@ -28,21 +28,16 @@ with DAG(
         bash_command=f"dbt source freshness --project-dir {DBT_DIR}",
     )
 
-    dbt_dag_test_2 = BashOperator(
-        task_id="dbt_dag_test_2",
-        bash_command=f"dbt run -s external_table_trans --project-dir {DBT_DIR}",
+    d_bronze_staging_table = BashOperator(
+        task_id="d_bronze_staging_table",
+        bash_command=f"dbt run -s d_bronze_staging_table --project-dir {DBT_DIR}",
     )
 
-    dbt_dag_test_3 = BashOperator(
-        task_id="dbt_dag_test_3",
-        bash_command=f"dbt run -s decimal_trans --project-dir {DBT_DIR}",
-    )
-
-    dbt_run = BashOperator(
-        task_id="dbt_run",
-        bash_command=f"dbt run -s silver_trans --project-dir {DBT_DIR}",
-    )
+    # e_write_to_gcs_silver = BashOperator(
+    #     task_id="e_write_to_gcs_silver",
+    #     bash_command=f"dbt run -s d_create_bronze_staging_table --project-dir {DBT_DIR}",
+    # )
 
 
-    dbt_dag_test >> dbt_dag_test_2 >> dbt_dag_test_3 >> dbt_run
-
+    dbt_dag_test >> d_bronze_staging_table
+    # >> e_write_to_gcs_silver

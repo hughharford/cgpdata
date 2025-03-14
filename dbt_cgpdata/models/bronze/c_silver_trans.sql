@@ -9,7 +9,7 @@ WITH imputed_data AS (
         COALESCE(close, (open + high + low) / 3) AS close,
         COALESCE(volume, 0) AS volume,
         ticker
-    FROM {{ ref('decimal_trans') }}
+    FROM {{ ref('b_decimal_trans') }}
 )
 
 SELECT * FROM imputed_data
