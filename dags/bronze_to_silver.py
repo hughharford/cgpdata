@@ -18,7 +18,9 @@ DATASET_NAME = os.getenv("GCP_BQ_DATASET_NAME")
 GCP_BQ_BRONZE_STAGING_TABLE = os.getenv("GCP_BQ_BRONZE_STAGING_TABLE")
 GCP_GCS_BUCKET_NAME = os.getenv("GCP_GCS_BUCKET_NAME")
 SILVER_PREFIX = "silver"
-SILVER_BUCKET_FILE = "e_silver_total_output"
+
+dt = pendulum.from_format(pendulum.now(), 'YYYY-MM-DD')
+SILVER_BUCKET_FILE = f"e_silver_total_output_{dt}"
 
 with DAG(
     "bronze_to_silver_dbt",
