@@ -13,6 +13,8 @@ class DataFilesBase(BaseModel):
 class DataFilesCreate(DataFilesBase):
     year: int | None = False
     month: int | None = False
+    blob_size: int | None = False
+    layer_name: str | None = None
 
 class DataFiles(DataFilesBase):
     time_date: datetime

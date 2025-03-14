@@ -13,8 +13,8 @@ GCP_KEY_FILE = os.getenv("GCP_KEY_FILE")
 
 SOURCE="alphavantage"
 API_KEY = KEY2
-YYYY="2022"
-MM="13" # start from 13 to get the full year
+YYYY="2020"
+MM="6" # start from 13 to get the full year
 INTERVAL="5min"
 TICKER="SPY"
 

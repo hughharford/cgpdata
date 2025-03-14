@@ -15,20 +15,37 @@ STORAGE_CLIENT = storage.Client.from_service_account_json(GCP_KEY_FILE)
 db_gen = crud.get_db()
 DB = next(db_gen)
 
-def write_datafile_records():
+def write_datafile_records(layers: list[str]=None):
     """
     Checks GCS for .csv files, checks already not listed in database,
     writes there if not already present.
     """
-    existing = get_listed_blobs_in_cgpbackbone()
-    blob_list = list_blobs_on_gcs()
-    written_files = 0
-    for blob in blob_list:
-        if blob not in existing:
-            tempdict = get_blob_metadata(bucket_name=BUCKET_NAME, blob_name=blob)
-            crud.create_data_file_record(DB, tempdict)
-            written_files = written_files + 1
-    print(f"written {written_files} files to the cgpbackbone db")
+    if layers:
+        for layer in layers:
+            existing = get_listed_blobs_in_cgpbackbone(layer)
+            blob_list = list_blobs_on_gcs(bucket_name=BUCKET_NAME
+                                  , storage_client=STORAGE_CLIENT
+                                  , layer=layer)
+            written_files = 0
+            for blob in blob_list:
+                if blob not in existing:
+                    tempdict = get_blob_metadata(bucket_name=BUCKET_NAME, blob_name=blob)
+                    crud.create_data_file_record(db=DB
+                                                 , layer=layer
+                                                 , datafile_about=tempdict)
+                    written_files = written_files + 1
+            print(f"written {written_files} {layer.upper()} files to the cgpbackbone db")
+    else:
+        # simple check for now
+        existing = get_listed_blobs_in_cgpbackbone()
+        blob_list = list_blobs_on_gcs()
+        written_files = 0
+        for blob in blob_list:
+            if blob not in existing:
+                tempdict = get_blob_metadata(bucket_name=BUCKET_NAME, blob_name=blob)
+                crud.create_data_file_record(DB, tempdict)
+                written_files = written_files + 1
+        print(f"written {written_files} files to the cgpbackbone db")
 
 # blob name must include prefix
 def get_blob_metadata(bucket_name, blob_name, storage_client=STORAGE_CLIENT):
@@ -75,20 +92,29 @@ def get_blob_metadata(bucket_name, blob_name, storage_client=STORAGE_CLIENT):
             #         f"retentionExpirationTime: {blob.retention_expiration_time}"
             #     )
 
+
     abt_datafile = dict()
     abt_datafile['datafilename'] = blob_name
     abt_datafile["uploadtime"] = blob.updated
     actualname = blob_name.split("/")[-1]
-    year_string = f"{actualname}".split("-")[0]
-    month_string = f"{actualname}".split("-")[1]
-    abt_datafile["year"] = int(year_string)
-    abt_datafile["month"] = int(month_string)
+    if len(actualname.split("-")) == 1:
+        month = 99
+        year = 99
+    else:
+        month = f"{actualname}".split("-")[1]
+        year = f"{actualname}".split("-")[0]
+    abt_datafile["month"] = int(month)
+    abt_datafile["year"] = int(year)
+    abt_datafile["blob_size"] = blob.size
 
     return abt_datafile
 
 
-def list_blobs_on_gcs(bucket_name=BUCKET_NAME, storage_client=STORAGE_CLIENT):
-    """Lists all the blobs in the bucket."""
+def list_blobs_on_gcs(bucket_name=BUCKET_NAME
+                      , storage_client=STORAGE_CLIENT
+                      , layer: str="-"):
+    """Lists all the blobs in the bucket.
+    Optional per layer """
     # Note: Client.list_blobs requires at least package version 1.17.0.
     blobs = storage_client.list_blobs(bucket_name)
 
@@ -96,22 +122,29 @@ def list_blobs_on_gcs(bucket_name=BUCKET_NAME, storage_client=STORAGE_CLIENT):
     gcs_blobs = []
     count = 0
     for blob in blobs:
-        if blob.name[-4:] == ".csv":
-            # print(blob.name)
+        if (blob.name[-4:] == ".csv") and (layer in blob.name):
             count = count + 1
             gcs_blobs.append(blob.name)
-    print(f"found {count} .csv files on GCS")
+    print(f"{layer} found {count} .csv files on GCS")
     return gcs_blobs
 
-def get_listed_blobs_in_cgpbackbone():
+def get_listed_blobs_in_cgpbackbone(layer: str="-"):
     '''Lists .csv files already in the db'''
     files_found = crud.read_data_files(DB)
     checker = []
-    for f in files_found:
-        checker.append(f.data_file_name)
+    for file in files_found:
+        if layer in file.layer_name:
+            checker.append(file.data_file_name)
         # print(f.data_file_name)
-    print(f"found {len(checker)} .csv files in cgpbackbone")
+    print(f"found {len(checker)} .csv files in {layer} layer in cgpbackbone")
     return checker
 
 if __name__ == "__main__":
-    write_datafile_records()
+    layers = ["raw", "hist", "silver", "gold"]
+    # blob_list = list_blobs_on_gcs(bucket_name=BUCKET_NAME
+    #                               , storage_client=STORAGE_CLIENT
+    #                               , layer="silver")
+    # postgreslisted = get_listed_blobs_in_cgpbackbone("hist")
+    # for b in postgreslisted:
+    #     print(b)
+    write_datafile_records(layers=layers)
