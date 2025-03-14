@@ -25,7 +25,7 @@ with DAG(
     # $CODE_BEGIN
     default_args={ "depends_on_past": False, },
     start_date=pendulum.today("UTC").add(days=-1),
-    schedule_interval="@daily",
+    schedule_interval="@monthly",
     catchup=False,
     # $CODE_END
 ) as dag:

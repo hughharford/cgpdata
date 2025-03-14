@@ -1,0 +1,596 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "defjslq8d5mv4d"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#eed8d8e8",
+            "mode": "shades"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n--\tCOUNT(d.data_file_name) AS count,\n\td.upload_time_date AS uploadtime,\n\td.layer_name,\n--\tEXTRACT(DAY FROM d.upload_time_date) AS day_uploaded,\n\tCOUNT(*) OVER (PARTITION BY EXTRACT(HOUR FROM d.upload_time_date)) as silver_upload_per_hour\nFROM\n\tdatafiles d\nWHERE\n\td.layer_name IN ('silver')\nGROUP BY \n\tuploadtime,\n\td.layer_name;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "No. Files Uploaded into Silver",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "defjslq8d5mv4d"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#ede1e1d9",
+            "mode": "shades"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 6,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n--\tCOUNT(d.data_file_name) AS count,\n\td.upload_time_date AS uploadtime,\n\td.layer_name,\n\t(SUM(d.blob_size) OVER (PARTITION BY EXTRACT(HOUR FROM d.upload_time_date)))/1000000 as silver_mb\nFROM\n\tdatafiles d\nWHERE\n\td.layer_name IN ('silver')\nGROUP BY \n\tuploadtime,\n\td.blob_size,\n\td.layer_name;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "MB in Silver Layer",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "defjslq8d5mv4d"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "shades"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 3,
+            "pointSize": 10,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 7
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n--\tCOUNT(d.data_file_name) AS count,\n\td.upload_time_date AS uploadtime,\n\td.layer_name,\n--\tEXTRACT(DAY FROM d.upload_time_date) AS day_uploaded,\n\tCOUNT(*) OVER (PARTITION BY EXTRACT(HOUR FROM d.upload_time_date)) as bronze_upload_per_hour\nFROM\n\tdatafiles d\nWHERE\n\td.layer_name IN ('hist', 'raw', 'bronze')\nGROUP BY \n\tuploadtime,\n\td.layer_name;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "No. Files  Uploaded into Bronze",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "defjslq8d5mv4d"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "shades"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 6,
+        "y": 7
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n--\tCOUNT(d.data_file_name) AS count,\n\td.upload_time_date AS uploadtime,\n\td.layer_name,\n\t(SUM(d.blob_size) OVER (PARTITION BY EXTRACT(HOUR FROM d.upload_time_date)))/1000000 as bronze_mb\nFROM\n\tdatafiles d\nWHERE\n\td.layer_name IN ('raw', 'hist', 'bronze')\nGROUP BY \n\tuploadtime,\n\td.blob_size,\n\td.layer_name;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "MB in Bronze Layer",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "defjslq8d5mv4d"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 13,
+        "x": 0,
+        "y": 14
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n\td.upload_time_date AS uploadtime,\n\tCOUNT(*) OVER (PARTITION BY EXTRACT(HOUR FROM d.upload_time_date)) as upload_per_hour\nFROM\n\tdatafiles d \nGROUP BY \n\tuploadtime;\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Number of data files up to GCS per hour",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "15m",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2025-03-09T23:09:27.956Z",
+    "to": "2025-03-17T23:09:27.956Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "About_data_in_GCS",
+  "uid": "cefqj0daxi1a8d",
+  "version": 10,
+  "weekStart": ""
+}
