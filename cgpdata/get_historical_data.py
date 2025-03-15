@@ -6,15 +6,17 @@ import pandas as pd
 
 from google.cloud import storage
 
-
-AIRFLOW_HOME = os.getenv("AIRFLOW_HOME")
-KEY2 = os.getenv("HSTH_AV_KEY")
 GCP_KEY_FILE = os.getenv("GCP_KEY_FILE")
 
+AIRFLOW_HOME = os.getenv("AIRFLOW_HOME")
+ORIGINAL_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+KEY2 = os.getenv("HSTH_AV_KEY")
+
+API_KEY = ORIGINAL_KEY
+
 SOURCE="alphavantage"
-API_KEY = KEY2
-YYYY="2020"
-MM="6" # start from 13 to get the full year
+YYYY="2016"
+MM="13" # start from 13 to get the full year
 INTERVAL="5min"
 TICKER="SPY"
 

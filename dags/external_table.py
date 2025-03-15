@@ -11,28 +11,28 @@ TABLE_SCHEMA = [
     {"name": "High", "type": "FLOAT"},
     {"name": "Low", "type": "FLOAT"},
     {"name": "Close", "type": "FLOAT"},
-    {"name": "Adj Close", "type": "FLOAT"},
     {"name": "Volume", "type": "INTEGER"},
+    {"name": "Ticker", "type": "STRING"},
 ]
 
 with DAG(
-    "create_bigquery_external_hist",
+    "create_bigquery_external_hist_silver",
     schedule_interval="@daily",
     start_date=days_ago(1),
     catchup=False,
 ) as dag:
 
-    create_external_table = BigQueryCreateExternalTableOperator(
-        task_id="create_external_table",
-        gcp_conn_id="google_cloud_default",
+    create_bigquery_external_hist_silver = BigQueryCreateExternalTableOperator(
+        task_id="create_bigquery_external_hist_silver",
+        gcp_conn_id="gcs",
         table_resource={
             "tableReference": {
                 "projectId": "condorgp-451516",
                 "datasetId": "cgpdata_lwb",
-                "tableId": "external_table"
+                "tableId": "external_table_silver"
             },
             "externalDataConfiguration": {
-                "sourceUris": [f"gs://cgpdata/hist/*.csv"],
+                "sourceUris": [f"gs://cgpdata/silver/*.csv"],
                 "sourceFormat": "CSV",
                 "csvOptions": {"skipLeadingRows": 1},
                 "autodetect": False,
@@ -41,4 +41,4 @@ with DAG(
         },
     )
 
-    create_external_table
+    create_bigquery_external_hist_silver
